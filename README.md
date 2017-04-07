@@ -32,6 +32,7 @@ Creates an instance of `SwiftClient` with the specified authentication informati
 | `username` | the username to authenticate with |
 | `password` | the password to authenticate with |
 
+**Example**
 ```js
 let client = SwiftClient.create('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
 ```
