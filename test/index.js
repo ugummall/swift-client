@@ -11,15 +11,10 @@ const config = rc('swiftclient');
 describe('SwiftClient', function () {
   this.timeout(4000);
 
-  var client;
+  var client = SwiftClient(config.url, config.username, config.password);
 
   before(function () {
-    return SwiftClient.create(config.url, config.username, config.password)
-      .then(function (c) {
-        client = c;
-
-        return client.create('swift-client-test');
-      });
+    return client.create('swift-client-test');
   });
 
 

@@ -2,37 +2,21 @@
 const requestp = require('request-promise');
 const SwiftContainer = require('./SwiftContainer');
 const SwiftEntity = require('./SwiftEntity');
+const SwiftAuthenticator = require('./SwiftAuthenticator');
 const util = require('util');
-
 
 module.exports = SwiftClient;
 
-function SwiftClient(url, token) {
-  SwiftEntity.call(this, 'Container', url, token);
+function SwiftClient(url, username, password) {
+  SwiftEntity.call(this, 'Container', new SwiftAuthenticator(url, username, password));
 }
 
 util.inherits(SwiftClient, SwiftEntity);
 
 
-SwiftClient.create = function (url, username, password) {
+SwiftClient.prototype.create = function (name, publicRead, meta, extra) {
   var _this = this;
 
-  return requestp({
-      method: 'POST',
-      uri: url,
-      headers: {
-        'x-auth-user': username,
-        'x-auth-key': password
-      },
-      resolveWithFullResponse: true
-    })
-    .then(function (response) {
-      return new SwiftClient(url, response.headers['x-auth-token']);
-    });
-};
-
-
-SwiftClient.prototype.create = function (name, publicRead, meta, extra) {
   if (typeof publicRead === 'undefined') {
     publicRead = false;
   }
@@ -44,14 +28,16 @@ SwiftClient.prototype.create = function (name, publicRead, meta, extra) {
     extra['x-container-read'] = '.r:*';
   }
 
-  return requestp({
+  _this.authenticator.authenticate().then(function(auth) {
+    return requestp({
       method: 'PUT',
-      uri: this.url + '/' + name,
-      headers: this.headers(meta, extra)
+      uri: auth.url + '/' + name,
+      headers: _this.headers(meta, extra, auth.token)
     });
+  });
 };
 
 
 SwiftClient.prototype.container = function (name) {
-  return new SwiftContainer(this.url + '/' + name, this.token);
+  return new SwiftContainer(this.authenticator);
 };

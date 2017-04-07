@@ -23,21 +23,11 @@ const SwiftClient = require('swift-client');
 
 I'm just going to use ES2016 (with async and await) for brevity in this document.
 
-### Authenticating
-
-The first task is to authenticate, thus creating a `SwiftClient` instance:
-
-```js
-let client = await SwiftClient.create('https://orbit.brightbox.com/v1/acc-xxxxx',
-  'cli-xxxxx', 'mysupersecretpassword');
-```
-
-
 
 ### `SwiftClient` class
 
 
-#### `SwiftClient.create(url, username, password)`
+#### `SwiftClient(url, username, password)`
 
 Creates an instance of `SwiftClient` with the specified authentication information.
 
@@ -47,6 +37,9 @@ Creates an instance of `SwiftClient` with the specified authentication informati
 | `username` | the username to authenticate with |
 | `password` | the password to authenticate with |
 
+```js
+let client = SwiftClient.create('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+```
 
 #### `SwiftClient#list()`
 

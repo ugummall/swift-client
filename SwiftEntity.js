@@ -5,71 +5,84 @@ const requestp = require('request-promise');
 module.exports = SwiftEntity;
 
 
-function SwiftEntity(childName, url, token) {
+function SwiftEntity(childName, authenticator) {
   this.childName = childName;
-  this.url = url;
-  this.token = token;
+  this.authenticator = authenticator;
 }
 
 
 SwiftEntity.prototype.list = function () {
-  return requestp({
-      uri: this.url,
-      headers: this.headers(),
+  var _this = this;
+
+  _this.authenticator.authenticate().then(function(auth){
+      return requestp({
+      uri: auth.url,
+      headers: _this.headers(null, null, auth.token),
       json: true
     });
+  });
 };
 
 
 SwiftEntity.prototype.update = function (name, meta, extra) {
-  return requestp({
-      method: 'POST',
-      uri: this.url + '/' + name,
-      headers: this.headers(meta, extra)
-    });
+  var _this = this;
+
+  _this.authenticator.authenticate().then(function(auth){
+    return requestp({
+        method: 'POST',
+        uri: auth.url + '/' + name,
+        headers: _this.headers(meta, extra, auth.token)
+      });
+  });
 };
 
 
 SwiftEntity.prototype.meta = function (name) {
   var _this = this;
 
-  return requestp({
-      method: 'HEAD',
-      uri: this.url + '/' + name,
-      headers: this.headers(),
-      resolveWithFullResponse: true
-    })
-    .then(function (response) {
-      var meta = {};
-      var headers = response.headers;
-      var regex = new RegExp('^X-' + _this.childName + '-Meta-(.*)$', 'i');
+  _this.authenticator.authenticate().then(function(auth){
+      return requestp({
+        method: 'HEAD',
+        uri: auth.url + '/' + name,
+        headers: _this.headers(null, null, auth.token),
+        resolveWithFullResponse: true
+      })
+      .then(function (response) {
+        var meta = {};
+        var headers = response.headers;
+        var regex = new RegExp('^X-' + _this.childName + '-Meta-(.*)$', 'i');
 
-      for (var k in headers) {
-        var m = k.match(regex);
+        for (var k in headers) {
+          var m = k.match(regex);
 
-        if (m) {
-          meta[m[1]] = headers[k];
+          if (m) {
+            meta[m[1]] = headers[k];
+          }
         }
-      }
 
-      return meta;
-    });
+        return meta;
+      });
+  });
 };
 
 
 SwiftEntity.prototype.delete = function (name) {
-  return requestp({
+  var _this = this;
+
+  _this.authenticator.authenticate().then(function(auth){
+    return requestp({
       method: 'DELETE',
-      uri: this.url + '/' + name,
-      headers: this.headers()
+      uri: auth.url + '/' + name,
+      headers: _this.headers(null, null, auth.token)
     });
+  });
 };
 
 
-SwiftEntity.prototype.headers = function (meta, extra) {
+SwiftEntity.prototype.headers = function (meta, extra, token) {
   var headers = Object.assign({
     'accept': 'application/json',
-    'x-auth-token': this.token
+    'x-auth-token': token
   }, extra);
 
   if (meta != null) {

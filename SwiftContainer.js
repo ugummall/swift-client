@@ -9,8 +9,8 @@ const util = require('util');
 module.exports = SwiftContainer;
 
 
-function SwiftContainer(url, token) {
-  SwiftEntity.call(this, 'Object', url, token);
+function SwiftContainer(authenticator) {
+  SwiftEntity.call(this, 'Object', authenticator);
 }
 
 util.inherits(SwiftContainer, SwiftEntity);
@@ -19,29 +19,33 @@ util.inherits(SwiftContainer, SwiftEntity);
 SwiftContainer.prototype.create = function (name, stream, meta, extra) {
   var _this = this;
 
-  return new Promise(function (resolve, reject) {
-    var req = request({
-        method: 'PUT',
-        uri: _this.url + '/' + name,
-        headers: _this.headers(meta, extra)
-      })
-      .on('error', function (err) {
-        reject(err);
-      })
-      .on('response', function (response) {
-        if (response.statusCode === 201) {
-          resolve();
-        } else {
-          reject(new Error('HTTP ' + response.statusCode));
-        }
-      });
+  _this.authenticator.authenticate().then(function(auth){
+    return new Promise(function (resolve, reject) {
+      var req = request({
+          method: 'PUT',
+          uri: auth.url + '/' + name,
+          headers: _this.headers(meta, extra, auth.token)
+        })
+        .on('error', function (err) {
+          reject(err);
+        })
+        .on('response', function (response) {
+          if (response.statusCode === 201) {
+            resolve();
+          } else {
+            reject(new Error('HTTP ' + response.statusCode));
+          }
+        });
 
-    stream.pipe(req);
+      stream.pipe(req);
+    });
   });
 };
 
 
 SwiftContainer.prototype.delete = function (name, when) {
+  var _this = this;
+
   if (when) {
     var h = {};
 
@@ -53,11 +57,13 @@ SwiftContainer.prototype.delete = function (name, when) {
       throw new Error('expected when to be a number of seconds or a date');
     }
 
-    return requestp({
-        method: 'POST',
-        uri: this.url + '/' + name,
-        headers: this.headers(null, h)
-      });
+    _this.authenticator.authenticate().then(function(auth){
+      return requestp({
+          method: 'POST',
+          uri: this.url + '/' + name,
+          headers: this.headers(null, h)
+        });
+    });
 
   } else {
     return SwiftEntity.prototype.delete.call(this, name);
@@ -68,20 +74,22 @@ SwiftContainer.prototype.delete = function (name, when) {
 SwiftContainer.prototype.get = function (name, stream) {
   var _this = this;
 
-  return new Promise(function (resolve, reject) {
-    request({
-        method: 'GET',
-        uri: _this.url + '/' + name,
-        headers: {
-          'x-auth-token': _this.token
-        }
-      })
-      .on('error', function (err) {
-        reject(err);
-      })
-      .on('end', function () {
-        resolve();
-      })
-      .pipe(stream);
+  _this.authenticator.authenticate().then(function(auth){
+    return new Promise(function (resolve, reject) {
+      request({
+          method: 'GET',
+          uri: _this.url + '/' + name,
+          headers: {
+            'x-auth-token': _this.token
+          }
+        })
+        .on('error', function (err) {
+          reject(err);
+        })
+        .on('end', function () {
+          resolve();
+        })
+        .pipe(stream);
+    });
   });
 };
