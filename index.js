@@ -28,7 +28,7 @@ SwiftClient.prototype.create = function (name, publicRead, meta, extra) {
     extra['x-container-read'] = '.r:*';
   }
 
-  _this.authenticator.authenticate().then(function(auth) {
+  return _this.authenticator.authenticate().then(function(auth) {
     return requestp({
       method: 'PUT',
       uri: auth.url + '/' + name,

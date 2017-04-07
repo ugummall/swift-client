@@ -20,17 +20,17 @@ function SwiftAuthenticator(authUrl, username, password) {
 SwiftAuthenticator.prototype.authenticate = function(cb) {
     var _this = this;
     
-    if(authenticated) {
+    if(this.authenticated) {
       return new Promise(function(resolve) {
         resolve({url: _this.url, token: _this.token});
       });
     } else {
       return requestp({
-        method: 'POST',
-        uri: url,
+        method: 'GET',
+        uri: _this.authUrl,
         headers: {
-          'x-auth-user': username,
-          'x-auth-key': password
+          'x-auth-user': _this.username,
+          'x-auth-key': _this.password
         },
         resolveWithFullResponse: true
       })

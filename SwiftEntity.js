@@ -14,7 +14,7 @@ function SwiftEntity(childName, authenticator) {
 SwiftEntity.prototype.list = function () {
   var _this = this;
 
-  _this.authenticator.authenticate().then(function(auth){
+  return _this.authenticator.authenticate().then(function(auth){
       return requestp({
       uri: auth.url,
       headers: _this.headers(null, null, auth.token),
@@ -27,7 +27,7 @@ SwiftEntity.prototype.list = function () {
 SwiftEntity.prototype.update = function (name, meta, extra) {
   var _this = this;
 
-  _this.authenticator.authenticate().then(function(auth){
+  return _this.authenticator.authenticate().then(function(auth){
     return requestp({
         method: 'POST',
         uri: auth.url + '/' + name,
@@ -40,7 +40,7 @@ SwiftEntity.prototype.update = function (name, meta, extra) {
 SwiftEntity.prototype.meta = function (name) {
   var _this = this;
 
-  _this.authenticator.authenticate().then(function(auth){
+  return _this.authenticator.authenticate().then(function(auth){
       return requestp({
         method: 'HEAD',
         uri: auth.url + '/' + name,
@@ -69,7 +69,7 @@ SwiftEntity.prototype.meta = function (name) {
 SwiftEntity.prototype.delete = function (name) {
   var _this = this;
 
-  _this.authenticator.authenticate().then(function(auth){
+  return _this.authenticator.authenticate().then(function(auth){
     return requestp({
       method: 'DELETE',
       uri: auth.url + '/' + name,

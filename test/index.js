@@ -11,7 +11,7 @@ const config = rc('swiftclient');
 describe('SwiftClient', function () {
   this.timeout(4000);
 
-  var client = SwiftClient(config.url, config.username, config.password);
+  var client = new SwiftClient(config.url, config.username, config.password);
 
   before(function () {
     return client.create('swift-client-test');

@@ -19,7 +19,7 @@ util.inherits(SwiftContainer, SwiftEntity);
 SwiftContainer.prototype.create = function (name, stream, meta, extra) {
   var _this = this;
 
-  _this.authenticator.authenticate().then(function(auth){
+  return _this.authenticator.authenticate().then(function(auth){
     return new Promise(function (resolve, reject) {
       var req = request({
           method: 'PUT',
@@ -57,7 +57,7 @@ SwiftContainer.prototype.delete = function (name, when) {
       throw new Error('expected when to be a number of seconds or a date');
     }
 
-    _this.authenticator.authenticate().then(function(auth){
+    return _this.authenticator.authenticate().then(function(auth){
       return requestp({
           method: 'POST',
           uri: this.url + '/' + name,
@@ -74,7 +74,7 @@ SwiftContainer.prototype.delete = function (name, when) {
 SwiftContainer.prototype.get = function (name, stream) {
   var _this = this;
 
-  _this.authenticator.authenticate().then(function(auth){
+  return _this.authenticator.authenticate().then(function(auth){
     return new Promise(function (resolve, reject) {
       request({
           method: 'GET',
