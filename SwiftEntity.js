@@ -5,8 +5,9 @@ const requestp = require('request-promise');
 module.exports = SwiftEntity;
 
 
-function SwiftEntity(childName, authenticator) {
+function SwiftEntity(childName, urlSuffix, authenticator) {
   this.childName = childName;
+  this.urlSuffix = urlSuffix ? '/' + urlSuffix : '';
   this.authenticator = authenticator;
 }
 
@@ -16,7 +17,7 @@ SwiftEntity.prototype.list = function () {
 
   return _this.authenticator.authenticate().then(function(auth){
       return requestp({
-      uri: auth.url,
+      uri: auth.url + _this.urlSuffix,
       headers: _this.headers(null, null, auth.token),
       json: true
     });
@@ -30,7 +31,7 @@ SwiftEntity.prototype.update = function (name, meta, extra) {
   return _this.authenticator.authenticate().then(function(auth){
     return requestp({
         method: 'POST',
-        uri: auth.url + '/' + name,
+        uri: auth.url + _this.urlSuffix + '/' + name,
         headers: _this.headers(meta, extra, auth.token)
       });
   });
@@ -43,7 +44,7 @@ SwiftEntity.prototype.meta = function (name) {
   return _this.authenticator.authenticate().then(function(auth){
       return requestp({
         method: 'HEAD',
-        uri: auth.url + '/' + name,
+        uri: auth.url + _this.urlSuffix + '/' + name,
         headers: _this.headers(null, null, auth.token),
         resolveWithFullResponse: true
       })
@@ -72,7 +73,7 @@ SwiftEntity.prototype.delete = function (name) {
   return _this.authenticator.authenticate().then(function(auth){
     return requestp({
       method: 'DELETE',
-      uri: auth.url + '/' + name,
+      uri: auth.url + _this.urlSuffix + '/' + name,
       headers: _this.headers(null, null, auth.token)
     });
   });

@@ -9,8 +9,8 @@ const util = require('util');
 module.exports = SwiftContainer;
 
 
-function SwiftContainer(authenticator) {
-  SwiftEntity.call(this, 'Object', authenticator);
+function SwiftContainer(containerName, authenticator) {
+  SwiftEntity.call(this, 'Object', containerName, authenticator);
 }
 
 util.inherits(SwiftContainer, SwiftEntity);
@@ -23,7 +23,7 @@ SwiftContainer.prototype.create = function (name, stream, meta, extra) {
     return new Promise(function (resolve, reject) {
       var req = request({
           method: 'PUT',
-          uri: auth.url + '/' + name,
+          uri: auth.url + _this.urlSuffix + '/' + name,
           headers: _this.headers(meta, extra, auth.token)
         })
         .on('error', function (err) {
@@ -60,8 +60,8 @@ SwiftContainer.prototype.delete = function (name, when) {
     return _this.authenticator.authenticate().then(function(auth){
       return requestp({
           method: 'POST',
-          uri: this.url + '/' + name,
-          headers: this.headers(null, h)
+          uri: auth.url + _this.urlSuffix + '/' + name,
+          headers: this.headers(null, h, auth.token)
         });
     });
 
@@ -78,9 +78,9 @@ SwiftContainer.prototype.get = function (name, stream) {
     return new Promise(function (resolve, reject) {
       request({
           method: 'GET',
-          uri: _this.url + '/' + name,
+          uri: auth.url + _this.urlSuffix + '/' + name,
           headers: {
-            'x-auth-token': _this.token
+            'x-auth-token': auth.token
           }
         })
         .on('error', function (err) {

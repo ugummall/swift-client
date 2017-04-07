@@ -8,7 +8,7 @@ const util = require('util');
 module.exports = SwiftClient;
 
 function SwiftClient(url, username, password) {
-  SwiftEntity.call(this, 'Container', new SwiftAuthenticator(url, username, password));
+  SwiftEntity.call(this, 'Container', null, new SwiftAuthenticator(url, username, password));
 }
 
 util.inherits(SwiftClient, SwiftEntity);
@@ -39,5 +39,5 @@ SwiftClient.prototype.create = function (name, publicRead, meta, extra) {
 
 
 SwiftClient.prototype.container = function (name) {
-  return new SwiftContainer(this.authenticator);
+  return new SwiftContainer(name, this.authenticator);
 };

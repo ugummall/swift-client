@@ -9,7 +9,7 @@ const config = rc('swiftclient');
 
 
 describe('SwiftClient', function () {
-  this.timeout(4000);
+  this.timeout(6000);
 
   var client = new SwiftClient(config.url, config.username, config.password);
 
@@ -115,5 +115,9 @@ describe('SwiftClient', function () {
           });
       });
     });
+  });
+
+  after(function () {
+    return client.delete('swift-client-test');
   });
 });
