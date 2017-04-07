@@ -1,24 +1,19 @@
 
 # Swift Client
 
-This library is for connecting to an OpenStack Swift storage server.
+Swift Client is a library for connecting to an OpenStack Swift storage server.
+This project has been forked from https://github.com/stewartml/swift-client.
 
 ## Installation
 
-    $ npm install --save swift-client
+    $ npm install --save openstack-swift-client
 
 ## Documentation
 
 The main class is `SwiftClient`, which can be imported as follows:
 
 ```js
-import SwiftClient from 'swift-client';
-```
-
-Or...
-
-```js
-const SwiftClient = require('swift-client');
+const SwiftClient = require('openstack-swift-client');
 ```
 
 I'm just going to use ES2016 (with async and await) for brevity in this document.
