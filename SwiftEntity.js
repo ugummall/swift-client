@@ -1,98 +1,77 @@
+"use strict";
 
 const requestp = require('request-promise');
 
+class SwiftEntity {
+    constructor(childName, urlSuffix, authenticator) {
+        this.childName = childName;
+        this.urlSuffix = urlSuffix ? `/${urlSuffix}` : '';
+        this.authenticator = authenticator;
+    }
 
-module.exports = SwiftEntity;
+    list() {
+        return this.authenticator.authenticate().then(auth => requestp({
+            uri: auth.url + this.urlSuffix,
+            headers: this.headers(null, null, auth.token),
+            json: true
+        }));
+    }
 
+    update(name, meta, extra) {
+        return this.authenticator.authenticate().then(auth => requestp({
+            method: 'POST',
+            uri: `${auth.url + this.urlSuffix}/${name}`,
+            headers: this.headers(meta, extra, auth.token)
+        }));
+    }
 
-function SwiftEntity(childName, urlSuffix, authenticator) {
-  this.childName = childName;
-  this.urlSuffix = urlSuffix ? '/' + urlSuffix : '';
-  this.authenticator = authenticator;
-}
+    meta(name) {
+        return this.authenticator.authenticate().then(auth => requestp({
+            method: 'HEAD',
+            uri: `${auth.url + this.urlSuffix}/${name}`,
+            headers: this.headers(null, null, auth.token),
+            resolveWithFullResponse: true
+        }).then(response => {
+            const meta = {};
+            const headers = response.headers;
+            const regex = new RegExp(`^X-${this.childName}-Meta-(.*)$`, 'i');
 
+            for (const k in headers) {
+                const m = k.match(regex);
 
-SwiftEntity.prototype.list = function () {
-  var _this = this;
+                if (m) {
+                    meta[m[1]] = headers[k];
+                }
+            }
 
-  return _this.authenticator.authenticate().then(function(auth){
-      return requestp({
-      uri: auth.url + _this.urlSuffix,
-      headers: _this.headers(null, null, auth.token),
-      json: true
-    });
-  });
-};
+            return meta;
+        }));
+    }
 
+    delete(name) {
+        return this.authenticator.authenticate().then(auth => requestp({
+            method: 'DELETE',
+            uri: `${auth.url + this.urlSuffix}/${name}`,
+            headers: this.headers(null, null, auth.token)
+        }));
+    }
 
-SwiftEntity.prototype.update = function (name, meta, extra) {
-  var _this = this;
+    headers(meta, extra, token) {
+        const headers = Object.assign({
+            'accept': 'application/json',
+            'x-auth-token': token
+        }, extra);
 
-  return _this.authenticator.authenticate().then(function(auth){
-    return requestp({
-        method: 'POST',
-        uri: auth.url + _this.urlSuffix + '/' + name,
-        headers: _this.headers(meta, extra, auth.token)
-      });
-  });
-};
-
-
-SwiftEntity.prototype.meta = function (name) {
-  var _this = this;
-
-  return _this.authenticator.authenticate().then(function(auth){
-      return requestp({
-        method: 'HEAD',
-        uri: auth.url + _this.urlSuffix + '/' + name,
-        headers: _this.headers(null, null, auth.token),
-        resolveWithFullResponse: true
-      })
-      .then(function (response) {
-        var meta = {};
-        var headers = response.headers;
-        var regex = new RegExp('^X-' + _this.childName + '-Meta-(.*)$', 'i');
-
-        for (var k in headers) {
-          var m = k.match(regex);
-
-          if (m) {
-            meta[m[1]] = headers[k];
-          }
+        if (meta != null) {
+            for (const k in meta) {
+                if (meta.hasOwnProperty(k)) {
+                    headers[`X-${this.childName}-Meta-${k}`] = meta[k];
+                }
+            }
         }
 
-        return meta;
-      });
-  });
-};
-
-
-SwiftEntity.prototype.delete = function (name) {
-  var _this = this;
-
-  return _this.authenticator.authenticate().then(function(auth){
-    return requestp({
-      method: 'DELETE',
-      uri: auth.url + _this.urlSuffix + '/' + name,
-      headers: _this.headers(null, null, auth.token)
-    });
-  });
-};
-
-
-SwiftEntity.prototype.headers = function (meta, extra, token) {
-  var headers = Object.assign({
-    'accept': 'application/json',
-    'x-auth-token': token
-  }, extra);
-
-  if (meta != null) {
-    for (var k in meta) {
-      if (meta.hasOwnProperty(k)) {
-        headers['X-' + this.childName + '-Meta-' + k] = meta[k];
-      }
+        return headers;
     }
-  }
+}
 
-  return headers;
-};
+module.exports = SwiftEntity;

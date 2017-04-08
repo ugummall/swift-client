@@ -1,43 +1,37 @@
+"use strict";
 
 const requestp = require('request-promise');
 const SwiftContainer = require('./SwiftContainer');
 const SwiftEntity = require('./SwiftEntity');
 const SwiftAuthenticator = require('./SwiftAuthenticator');
-const util = require('util');
 
-module.exports = SwiftClient;
+class SwiftClient extends SwiftEntity {
+    constructor(url, username, password) {
+        super('Container', null, new SwiftAuthenticator(url, username, password));
+    }
 
-function SwiftClient(url, username, password) {
-  SwiftEntity.call(this, 'Container', null, new SwiftAuthenticator(url, username, password));
+    create(name, publicRead, meta, extra) {
+        if (typeof publicRead === 'undefined') {
+            publicRead = false;
+        }
+
+        if (publicRead) {
+            if (!extra)
+                extra = {};
+
+            extra['x-container-read'] = '.r:*';
+        }
+
+        return this.authenticator.authenticate().then(auth => requestp({
+            method: 'PUT',
+            uri: `${auth.url}/${name}`,
+            headers: this.headers(meta, extra, auth.token)
+        }));
+    }
+
+    container(name) {
+        return new SwiftContainer(name, this.authenticator);
+    }
 }
 
-util.inherits(SwiftClient, SwiftEntity);
-
-
-SwiftClient.prototype.create = function (name, publicRead, meta, extra) {
-  var _this = this;
-
-  if (typeof publicRead === 'undefined') {
-    publicRead = false;
-  }
-
-  if (publicRead) {
-    if (!extra)
-      extra = {};
-    
-    extra['x-container-read'] = '.r:*';
-  }
-
-  return _this.authenticator.authenticate().then(function(auth) {
-    return requestp({
-      method: 'PUT',
-      uri: auth.url + '/' + name,
-      headers: _this.headers(meta, extra, auth.token)
-    });
-  });
-};
-
-
-SwiftClient.prototype.container = function (name) {
-  return new SwiftContainer(name, this.authenticator);
-};
+module.exports = SwiftClient;
