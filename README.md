@@ -4,6 +4,15 @@
 Swift Client is a library for connecting to an OpenStack Swift storage server.
 This project has been forked from https://github.com/stewartml/swift-client.
 
+*Example*
+```js
+const SwiftClient = require('openstack-swift-client');
+let client = new SwiftClient('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+let container = client.container('my-container');
+container.get('test-file', process.stdout).then(() => {
+    console.log("Done!");
+});
+```
 ## Installation
 
     $ npm install --save openstack-swift-client
@@ -12,6 +21,10 @@ This project has been forked from https://github.com/stewartml/swift-client.
 
 The main class is `SwiftClient`, which can be imported as follows:
 
+```js
+import SwiftClient from 'swift-client';
+```
+or
 ```js
 const SwiftClient = require('openstack-swift-client');
 ```
@@ -34,7 +47,7 @@ Creates an instance of `SwiftClient` with the specified authentication informati
 
 **Example**
 ```js
-let client = SwiftClient.create('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+let client = new SwiftClient('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
 ```
 
 #### `SwiftClient#list()`
