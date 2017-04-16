@@ -50,9 +50,14 @@ Creates an instance of `SwiftClient` with the specified authentication informati
 let client = new SwiftClient('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
 ```
 
-#### `SwiftClient#list()`
+#### `SwiftClient#list(extra)`
 
 Gets an array of containers.
+
+| Argument | Description |
+|----------|-------------|
+| `extra` | a hash of additional headers to send (optional) |
+
 
 **Example**
 
@@ -62,7 +67,7 @@ await client.list();
 /* returns:
 [
   {name: 'container-name', count: 123, bytes: 12438468},
-  ...
+  (...)
 ]
 */
 ```
@@ -158,22 +163,56 @@ Gets an instance of `SwiftContainer` for the specified container.
 let container = client.container('my-container');
 ```
 
+#### `SwiftClient#info()`
 
-### `SwiftContainer` class
+Gets cluster configuration parameters
 
-#### `SwiftContainer#list()`
-
-Gets an array of objects in the container.
 
 **Example**
 
 ```js
-await client.list();
+await client.info();
+
+/* returns:
+
+{
+  bulk_delete: { max_failed_deletes: 1000, max_deletes_per_request: 10000 },
+  (...),
+  swift: 
+   { max_file_size: 5368709122,
+     account_listing_limit: 10000,
+     (...),
+     max_container_name_length: 256
+   }
+}
+*/
+```
+
+### `SwiftContainer` class
+
+#### `SwiftContainer#list(extra)`
+
+Gets an array of objects in the container.
+
+| Argument | Description |
+|----------|-------------|
+| `extra` | a hash of additional headers to send (optional) |
+
+**Example**
+
+```js
+await container.list();
 
 /* returns:
 [
-  {name: 'container-name', count: 123, bytes: 12438468},
-  ...
+  { 
+      hash: '03b3aac569fab8b59dcf8f210f8d3bc8',
+      last_modified: '2017-03-31T13:27:56.042120',
+      bytes: 102400,
+      name: 'picture.png',
+      content_type: 'application/octet-stream'
+  },
+  (...)
 ]
 */
 ```

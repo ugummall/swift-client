@@ -9,10 +9,10 @@ class SwiftEntity {
         this.authenticator = authenticator;
     }
 
-    list() {
+    list(extra) {
         return this.authenticator.authenticate().then(auth => requestp({
             uri: auth.url + this.urlSuffix,
-            headers: this.headers(null, null, auth.token),
+            headers: this.headers(null, extra, auth.token),
             json: true
         }));
     }
