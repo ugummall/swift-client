@@ -7,7 +7,9 @@ This project has been forked from https://github.com/stewartml/swift-client.
 *Example*
 ```js
 const SwiftClient = require('openstack-swift-client');
-let client = new SwiftClient('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+const authenticator = new SwiftClient.SwiftAuthenticator('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+
+let client = new SwiftClient(authenticator);
 let container = client.container('my-container');
 container.get('test-file', process.stdout).then(() => {
     console.log("Done!");
@@ -35,9 +37,9 @@ I'm just going to use ES2016 (with async and await) for brevity in this document
 ### `SwiftClient` class
 
 
-#### `SwiftClient(url, username, password)`
+#### `SwiftClient(authenticator)`
 
-Creates an instance of `SwiftClient` with the specified authentication information.
+Creates an instance of `SwiftClient` with the specified authenticator
 
 | Argument | Description |
 |----------|-------------|
