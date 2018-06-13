@@ -2,14 +2,16 @@
 
 const URL = require('url-parse');
 const requestp = require('request-promise');
+
 const SwiftContainer = require('./SwiftContainer');
 const SwiftEntity = require('./SwiftEntity');
 const SwiftAuthenticator = require('./SwiftAuthenticator');
+const KeystoneV3Authenticator = require('./KeystoneV3Authenticator');
 
 class SwiftClient extends SwiftEntity {
-    constructor(url, username, password) {
-        super('Container', null, new SwiftAuthenticator(url, username, password));
-        this.infoUrl = (new URL(url)).origin + "/info";
+    constructor(authenticator) {
+        super('Container', null, authenticator);
+        
     }
 
     create(name, publicRead, meta, extra) {
@@ -35,10 +37,12 @@ class SwiftClient extends SwiftEntity {
      * Gets cluster configuration parameters
      * @returns {Promise.<Object>}
      */
-    info() {
+    async info() {
+        const auth = await this.authenticator.authenticate();
+        const infoUrl = (new URL(auth.url)).origin + "/info";
         return requestp({
             method: 'GET',
-            uri: this.infoUrl,
+            uri: infoUrl,
             json: true
         })
     }
@@ -47,5 +51,8 @@ class SwiftClient extends SwiftEntity {
         return new SwiftContainer(name, this.authenticator);
     }
 }
+
+SwiftClient.SwiftAuthenticator = SwiftAuthenticator;
+SwiftClient.KeystoneV3Authenticator = KeystoneV3Authenticator;
 
 module.exports = SwiftClient;
