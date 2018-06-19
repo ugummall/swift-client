@@ -4,12 +4,13 @@ const expect = require('chai').expect;
 const fs = require('fs');
 const stream = require('stream');
 const SwiftClient = require('../index');
-const config = require('../swift-account.json');
+
+const credentials = require('./credentials.ksv3.json');
 
 describe('SwiftClient', function () {
     this.timeout(4000);
 
-    const client = new SwiftClient(config.url, config.username, config.password);
+    const client = new SwiftClient(new SwiftClient.KeystoneV3Authenticator(credentials));
 
     before(() => client.create('swift-client-test'));
 

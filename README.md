@@ -7,7 +7,9 @@ This project has been forked from https://github.com/stewartml/swift-client.
 *Example*
 ```js
 const SwiftClient = require('openstack-swift-client');
-let client = new SwiftClient('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+const authenticator = new SwiftClient.SwiftAuthenticator('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+
+let client = new SwiftClient(authenticator);
 let container = client.container('my-container');
 container.get('test-file', process.stdout).then(() => {
     console.log("Done!");
@@ -35,9 +37,22 @@ I'm just going to use ES2016 (with async and await) for brevity in this document
 ### `SwiftClient` class
 
 
-#### `SwiftClient(url, username, password)`
+#### `SwiftClient(authenticator)`
 
-Creates an instance of `SwiftClient` with the specified authentication information.
+Creates an instance of `SwiftClient` with the specified authenticator
+
+| Argument | Description |
+|----------|-------------|
+| `authenticator` | an authenticator instance (see below) |
+
+**Example**
+```js
+let client = new SwiftClient('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+```
+
+#### `SwiftClient.SwiftAuthenticator(url, username, password)`
+
+Creates an instance of `SwiftClientAuthenticator` with the specified authentication information.
 
 | Argument | Description |
 |----------|-------------|
@@ -47,7 +62,29 @@ Creates an instance of `SwiftClient` with the specified authentication informati
 
 **Example**
 ```js
-let client = new SwiftClient('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password');
+let client = new SwiftClient(new SwiftClient.SwiftAuthenticator('https://orbit.brightbox.com/v1/acc-xxx', 'cli-xxx', 'my-password'));
+```
+
+
+#### `SwiftClient.KeystoneV3Authenticator(credentials)`
+
+Creates an instance of `KeystoneV3Authenticator` with the specified authentication information.
+
+| Argument | Description |
+|----------|-------------|
+| `credentials` | credential object |
+
+**Example**
+```js
+let credentials = {
+  "endpointUrl": "https://os.eu-de-darz.msh.host:5000/v3",
+  "username": "user",
+  "password": "pasword",
+  "domainId": "e6efe92d05c2430ea7eb6f626815d0d8",
+  "projectId": "ff912d95d2eb46099e755cd268714d37"
+}
+
+let client = new SwiftClient(new SwiftClient.KeystoneV3Authenticator(credentials));
 ```
 
 #### `SwiftClient#list(extra)`
