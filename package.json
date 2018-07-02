@@ -1,6 +1,6 @@
 {
   "name": "openstack-swift-client",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Connects to OpenStack Swift storage servers",
   "main": "index.js",
   "directories": {
@@ -34,6 +34,7 @@
     "node": ">=4"
   },
   "dependencies": {
+    "query-string": "^6.1.0",
     "request": "^2.74.0",
     "request-promise": "^4.1.1",
     "url-parse": "^1.1.8"
