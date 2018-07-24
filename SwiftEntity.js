@@ -10,8 +10,8 @@ class SwiftEntity {
         this.authenticator = authenticator;
     }
 
-    list(extra, query = '') {
-        const querystring = ( query ) ? '?'+queryString.stringify(query) : query;
+    list(extra, query) {
+        const querystring = query ? '?' + queryString.stringify(query) : '';
         return this.authenticator.authenticate().then(auth => requestp({
             uri: auth.url + this.urlSuffix + querystring,
             headers: this.headers(null, extra, auth.token),
