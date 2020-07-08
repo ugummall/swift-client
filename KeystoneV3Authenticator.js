@@ -76,7 +76,7 @@ class KeystoneV3Authenticator extends EventEmitter {
 
     return {
       token: response.headers['x-subject-token'],
-      expires: new Date(response.body.expires_at), // expires_at is an ISO 8601 Date:
+      expires: new Date(response.body.token.expires_at), // expires_at is an ISO 8601 Date:
       swiftUrl: swiftUrl
     }
   };
@@ -88,7 +88,7 @@ class KeystoneV3Authenticator extends EventEmitter {
 
     const tokenPreRefreshInterval = 10000; // renew tokens 10s before they expire
     const requestedTokenExpiry = new Date(Date.now() + tokenPreRefreshInterval)
-    if (requestedTokenExpiry > this.currentToken.expires_at) {
+    if (requestedTokenExpiry > this.currentToken.expires) {
       this.currentToken = await this.getToken();
     }
 
