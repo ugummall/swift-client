@@ -1,7 +1,7 @@
 "use strict";
 
 const URL = require('url-parse');
-const requestp = require('request-promise');
+const requestp = require('request-promise').defaults({ jar: true });
 
 const SwiftContainer = require('./SwiftContainer');
 const SwiftEntity = require('./SwiftEntity');

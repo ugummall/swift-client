@@ -1,6 +1,6 @@
 "use strict";
 
-const requestp = require('request-promise');
+const requestp = require('request-promise').defaults({ jar: true });
 const queryString = require('query-string');
 
 class SwiftEntity {

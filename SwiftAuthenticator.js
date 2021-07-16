@@ -1,7 +1,7 @@
 "use strict";
 
 const EventEmitter = require('events');
-const requestp = require('request-promise');
+const requestp = require('request-promise').defaults({ jar: true });
 
 const AUTH_STATUS = {
     UNAUTHENTICATED: 0,
