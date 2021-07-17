@@ -1,6 +1,6 @@
 "use strict";
 
-const request = require('request');
+const request = require('request').defaults({ jar: true });
 const requestp = require('request-promise').defaults({ jar: true });
 const SwiftEntity = require('./SwiftEntity');
 
