@@ -18,6 +18,7 @@ class SwiftAuthenticator extends EventEmitter {
         // Authenticated credentials
         let url;
         let token;
+        let efsrcookie;     // UKR: introducing my own cookie
 
         // Authentication process flags
         let authStatus = AUTH_STATUS.UNAUTHENTICATED;
@@ -35,6 +36,12 @@ class SwiftAuthenticator extends EventEmitter {
         }).then(response => {
             url = response.headers['x-storage-url'];
             token = response.headers['x-auth-token'];
+            console.log('UKR-DEBUG: x-auth-token is: ' + response.headers['x-auth-token']);
+            console.log('UKR-DEBUG: x-storage-url is: ' + response.headers['x-storage-url']);
+            //console.log(response.headers);
+            console.log('UKR-DEBUG: cookie is: ' + response.headers['set-cookie']);
+            //efsrcookie = "SWIFT_SERVER_ID=swift01";
+            efsrcookie = response.headers['set-cookie'];
             authStatus = AUTH_STATUS.AUTHENTICATED;
             this.emit(AUTH_EVENT);
         }).catch(err => {
@@ -50,7 +57,7 @@ class SwiftAuthenticator extends EventEmitter {
                     returnPromise = new Promise((resolve, reject) => {
                         const authListener = () => {
                             this.removeListener(AUTH_EVENT, authListener);
-                            if (authStatus === AUTH_STATUS.AUTHENTICATED) resolve({url: url, token: token});
+                            if (authStatus === AUTH_STATUS.AUTHENTICATED) resolve({url: url, token: token, efsrcookie: efsrcookie});
                             if (authStatus === AUTH_STATUS.FAILED) reject(authError);
                         };
 
@@ -59,7 +66,7 @@ class SwiftAuthenticator extends EventEmitter {
                     break;
                 case AUTH_STATUS.AUTHENTICATED:
                     returnPromise = new Promise(resolve => {
-                        resolve({url: url, token: token});
+                        resolve({url: url, token: token, efsrcookie: efsrcookie});
                     });
                     break;
                 case AUTH_STATUS.FAILED:

@@ -5,25 +5,30 @@ const queryString = require('query-string');
 
 class SwiftEntity {
     constructor(childName, urlSuffix, authenticator) {
+        console.log('UKR-DEBUG: You are using UKR version...');
         this.childName = childName;
         this.urlSuffix = urlSuffix ? `/${urlSuffix}` : '';
         this.authenticator = authenticator;
+        //console.log("UKR-DEBUG: List authenticator");
+        //console.log(authenticator);
     }
 
     list(extra, query) {
+        // UKR: shifting to method headers. Better use headers
         const querystring = query ? '?' + queryString.stringify(query) : '';
         return this.authenticator.authenticate().then(auth => requestp({
             uri: auth.url + this.urlSuffix + querystring,
-            headers: this.headers(null, extra, auth.token),
+            headers: this.headers(null, extra, auth.token, auth.efsrcookie),
             json: true
-        }));
+        }))
+        ;
     }
 
     update(name, meta, extra) {
         return this.authenticator.authenticate().then(auth => requestp({
             method: 'POST',
             uri: `${auth.url + this.urlSuffix}/${name}`,
-            headers: this.headers(meta, extra, auth.token)
+            headers: this.headers(meta, extra, auth.token, auth.efsrcookie)
         }));
     }
 
@@ -31,7 +36,7 @@ class SwiftEntity {
         return this.authenticator.authenticate().then(auth => requestp({
             method: 'HEAD',
             uri: `${auth.url + this.urlSuffix}/${name}`,
-            headers: this.headers(null, null, auth.token),
+            headers: this.headers(null, null, auth.token, auth.efsrcookie),
             resolveWithFullResponse: true
         }).then(response => {
             const meta = {};
@@ -54,15 +59,22 @@ class SwiftEntity {
         return this.authenticator.authenticate().then(auth => requestp({
             method: 'DELETE',
             uri: `${auth.url + this.urlSuffix}/${name}`,
-            headers: this.headers(null, null, auth.token)
+            headers: this.headers(null, null, auth.token, auth.efsrcookie)
         }));
     }
 
-    headers(meta, extra, token) {
+    headers(meta, extra, token, efsrcookie) {
         const headers = Object.assign({
             'accept': 'application/json',
-            'x-auth-token': token
+            'x-auth-token': token,
+            'cookie' : efsrcookie
         }, extra);
+
+        console.log('UKR-DEBUG: Seting headers started');
+        //console.log(meta);
+        //console.log(extra);
+        //console.log(token);
+        console.log('UKR-DEBUG: Seting headers ended');
 
         if (meta != null) {
             for (const k in meta) {

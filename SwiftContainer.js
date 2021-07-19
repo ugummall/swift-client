@@ -15,7 +15,7 @@ class SwiftContainer extends SwiftEntity {
             const req = request({
                 method: 'PUT',
                 uri: `${auth.url + this.urlSuffix}/${name}`,
-                headers: this.headers(meta, extra, auth.token)
+                headers: this.headers(meta, extra, auth.token, auth.efsrcookie)
             }).on('error', err => {
                 reject(err);
             }).on('response', response => {
@@ -46,7 +46,7 @@ class SwiftContainer extends SwiftEntity {
                 return requestp({
                     method: 'POST',
                     uri: `${auth.url + this.urlSuffix}/${name}`,
-                    headers: this.headers(null, h, auth.token)
+                    headers: this.headers(null, h, auth.token, auth.efsrcookie)
                 });
             });
 
@@ -61,7 +61,8 @@ class SwiftContainer extends SwiftEntity {
                 method: 'GET',
                 uri: `${auth.url + this.urlSuffix}/${name}`,
                 headers: {
-                    'x-auth-token': auth.token
+                    'x-auth-token': auth.token,
+                    'cookie' : auth.efsrcookie  // UKR: this is an excpetion. Should have coded similar manner.
                 }
             }).on('error', err => {
                 reject(err);
